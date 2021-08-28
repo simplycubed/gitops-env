@@ -1,0 +1,32 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: gitops-samples-app
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: gitops-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gitops-app
+    spec:
+      containers:
+      - name: gitops-app
+        image: gcr.io/simplycubed/app:latest
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+      initContainers:
+        - name: db-migrations
+          image: gcr.io/simplycubed/db-migrations:latest
